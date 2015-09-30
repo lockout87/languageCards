@@ -1,15 +1,38 @@
-jag,I,10
-ja,yes,10
-nej,no,10
-heter,name,10
-i,in,10
-du,you,10
-efternamn,last name,10
-bor,reside,10
-vad,what,10
-var,where,10
-ifran,from,10
-kommer,come,10
-elev,student,10
-lärare,teacher,10
-Ursäkta,excuse me,10
+jag,I,8
+ja,yes,6
+nej,no,8
+heter,name,8
+i,in,8
+du,you,9
+efternamn,last name,7
+bor,reside,7
+vad,what,7
+var,where,8
+ifran,from,6
+kommer,come,7
+elev,student,8
+lärare,teacher,8
+Ursäkta,excuse me,8
+vad heter du,What's your name,10
+jag heter,my name,9
+vad heter efternamn du,what is your last name,10
+jag heter Trudo i efternamn,my last name is trudo,10
+var kommer ifran du,where are you from,9
+jag kommer ifran Portland,I come from Portland,10
+var bor du,where do you live,9
+jag bor Eugene,I live in Eugene,10
+jag har en fråga, I have a question,10
+Vad betyder det?,What does that mean?,10
+Hur säger man ... på svenska?,how do you say ... in svenska?,9
+Hur uttalar man ..?,How do you pronounce?,10
+Hur stavar/skriver man ...?,How do you spell/write?,10
+Kan du säga det en gång till?,Could you repeat that?,10
+Jag förstär inte.,I don't understand.,9
+Har ni några frågor?,Do you have any questions?,10
+Titta på sidan X i textboken/övningsboken.,Look at page X in the textbook/exercise book.,10
+Läs texten på sidan X,Read the text on page X.,9
+Stäng boken.,Close the book.,10
+Lyssna.,Listen.,9
+Säg efter mig.,Repeat after me.,10
+Arbeta i par.,Work in pairs.,10
+Prata svenska,Speak Swedish.,9

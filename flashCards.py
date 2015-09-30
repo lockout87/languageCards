@@ -1,5 +1,9 @@
 __author__ = 'lockout87'
-from random import shuffle
+from random import shuffle, seed
+from datetime import datetime
+
+seed(datetime.now())
+
 
 class LineLengthException(Exception):
     """
@@ -12,6 +16,39 @@ class LineLengthException(Exception):
     def __str__(self):
         return "Line length not 3:", self.line
 
+class BoundedNumber(object):
+    """
+    A number that has a upper and lower bound.
+    """
+    class OutOfBounds(Exception):
+        """
+
+        """
+    def __init__(self, minimum, maximum, initValue):
+        self.min = minimum
+        self.max = maximum
+        self._value = initValue
+
+    def set(self, value):
+        if self.min <= value <= self.max:
+            self._value = value
+        else:
+            if value > self.max:
+                self._value = self.max
+            else:
+                self._value = self.min
+
+    def get(self):
+        return int(self._value)
+
+    def increment(self):
+        if self._value + 1 <= self.max:
+            self._value += 1
+
+    def decrement(self):
+        if self._value - 1 >= self.min:
+            self._value -= 1
+
 
 class Word(object):
     def __init__(self, line):
@@ -21,7 +58,7 @@ class Word(object):
 
         self.swedish    = splitLine[0]
         self.english    = splitLine[1]
-        self.rank       = int(splitLine[2])
+        self.rank       = BoundedNumber(1, 20, int(splitLine[2]))
 
 
 class Phrase(object):
@@ -32,7 +69,7 @@ class Phrase(object):
 
         self.swedish  = splitLine[0]
         self.english  = splitLine[1]
-        self.rank     = int(splitLine[2])
+        self.rank     = BoundedNumber(1, 20, int(splitLine[2]))
 
 
 class Stack(object):
@@ -42,7 +79,7 @@ class Stack(object):
         for arg in args:
             self.cardList.extend(arg)
 
-        self.stackRank = sum(card.rank for card in self.cardList)/len(self.cardList)
+        self.stackRank = sum(card.rank.get() for card in self.cardList)/len(self.cardList)
         self.stackCoefficient = self.stackSize / len(self.cardList)
 
         self.stack = self.shuffleStack()
@@ -52,19 +89,10 @@ class Stack(object):
 
     def shuffleStack(self):
         stack = []
-        localCardList = self.cardList
-        shuffle(localCardList)
-        cardUse = {}
-        while len(stack) < self.stackSize:
-            addCard = self.getBest(localCardList)
-            if addCard in cardUse:
-                cardUse[addCard] += 1
-            else:
-                cardUse[addCard] = 1
-            if cardUse[addCard] >= self.stackRank:
-                localCardList.remove(addCard)
-            stack.append(addCard)
+        for card in self.cardList:
+            stack.extend([card] * card.rank.get())
         shuffle(stack)
+        stack = stack[:self.stackSize]
         return stack
 
     def getBest(self, cardList):
@@ -72,10 +100,10 @@ class Stack(object):
         bestCard = None
         for card in cardList:
             if best is None:
-                best = abs(card.rank - self.stackRank)
+                best = abs(card.rank.get() - self.stackRank)
                 bestCard = card
                 continue
-            newBest = abs(card.rank - self.stackRank)
+            newBest = abs(card.rank.get() - self.stackRank)
             if newBest < best:
                 best = newBest
                 bestCard = card
@@ -103,14 +131,16 @@ class Stack(object):
             card = self.pullCard()
             answer = self.getAnswer()
             if self.answerCorrect(card, answer):
+                print "Correct!", card.swedish, "is", card.english
                 if card not in self.correctStack and card not in self.incorrectStack:
-                    card.rank -= 1
+                    card.rank.decrement()
                     self.correctStack.append(card)
             else:
+                print "Incorrect!", card.swedish, "is", card.english
                 if card in self.incorrectStack:
-                    self.incorrectStack[self.incorrectStack.index(card)].rank += 1
+                    self.incorrectStack[self.incorrectStack.index(card)].rank.increment()
                 else:
-                    card.rank += 1
+                    card.rank.decrement()
                     self.incorrectStack.append(card)
                     if card in self.correctStack:
                         self.correctStack.remove(card)
@@ -129,15 +159,12 @@ def loadFile(filePath, fileType):
 def writeFile(filePath, cards):
     with open(filePath, "w") as file:
         for card in cards:
-            file.write(card.swedish + "," + card.english + "," + str(card.rank) + "\n")
+            file.write(card.swedish + "," + card.english + "," + str(card.rank.get()) + "\n")
 
 if __name__ == "__main__":
-    words   = loadFile("newwords", Word)
-    #phrases = loadFile("newPhrases", Phrase)
-    cardStack = Stack(words)#, phrases)
-
+    words   = loadFile("newWords", Word)
+    phrases = loadFile("newPhrases", Phrase)
+    cardStack = Stack(words, phrases)
     cardStack.cycle()
-    print cardStack.incorrectStack
-    print cardStack.correctStack
 
-    writeFile("whatever", cardStack.cardList)
+    writeFile("newWords", cardStack.cardList)
